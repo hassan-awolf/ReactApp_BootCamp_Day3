@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
+
 /* Created by halam on 8/25/2017.*/
 function Square(props) {
     return (
@@ -65,7 +66,7 @@ class Game extends React.Component {
         const history = this.state.history.slice(0, this.state.stepNumber + 1);
         const current = history[history.length - 1];
         const squares = current.squares.slice();
-        if (calculateWinner(squares) || squares[i]) {
+        if (calculateWinner(squares,this.state.stepNumber) || squares[i]) {
             return;
         }
         squares[i] = this.state.xIsNext ? 'X' : 'O';
@@ -93,16 +94,23 @@ class Game extends React.Component {
         const current = history[this.state.stepNumber];
         const winner = calculateWinner(current.squares);
 
+    let previous_move;
+
         const moves = history.map((step, move) => {
             const desc = move ?
                 'Move #' + move :
                 'Game start';
+
+            previous_move = move;
+
             return (
                 <li key={move}>
                     <a href="#" onClick={() => this.jumpTo(move)}>{desc}</a>
                 </li>
+
             );
         });
+
 
 
         let status;
@@ -116,7 +124,12 @@ class Game extends React.Component {
             {
                 this.state.yscore++;
             }
-        } else {
+        }
+            else if (previous_move === 9)
+        {
+            status = 'Draw';
+        }
+            else {
             status = 'Next player: ' + (this.state.xIsNext ? 'X' : 'O');
         }
 
@@ -162,6 +175,7 @@ function calculateWinner(squares) {
         [0, 4, 8],
         [2, 4, 6],
     ];
+
     for (let i = 0; i < lines.length; i++) {
         const [a, b, c] = lines[i];
         if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
